@@ -23,6 +23,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    applicationId = "com.xuexiang.flutter_xupdate"
     compileSdkVersion 31
 
     compileOptions {
