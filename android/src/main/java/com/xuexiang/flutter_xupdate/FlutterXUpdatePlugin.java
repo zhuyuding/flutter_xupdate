@@ -25,7 +25,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * FlutterXUpdatePlugin
@@ -41,12 +40,6 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
     private Application mApplication;
     private WeakReference<Activity> mActivity;
 
-    @Override
-    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        mMethodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), PLUGIN_NAME);
-        mApplication = (Application) flutterPluginBinding.getApplicationContext();
-        mMethodChannel.setMethodCallHandler(this);
-    }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
@@ -54,11 +47,10 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
         mMethodChannel = null;
     }
 
-    public FlutterXUpdatePlugin initPlugin(MethodChannel methodChannel, Registrar registrar) {
-        mMethodChannel = methodChannel;
-        mApplication = (Application) registrar.context().getApplicationContext();
-        mActivity = new WeakReference<>(registrar.activity());
-        return this;
+     // 新版注册方法（Flutter 2.0+）
+    public static void registerWith(FlutterPluginBinding binding) {
+        final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), PLUGIN_NAME);
+        channel.setMethodCallHandler(new FlutterXUpdatePlugin());
     }
 
     @Override
@@ -281,21 +273,16 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
+        mActivity = null;
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-
+        mActivity = new WeakReference<>(binding.getActivity());
     }
 
     @Override
     public void onDetachedFromActivity() {
         mActivity = null;
-    }
-
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), PLUGIN_NAME);
-        channel.setMethodCallHandler(new FlutterXUpdatePlugin().initPlugin(channel, registrar));
     }
 }
