@@ -52,6 +52,13 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
         final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), PLUGIN_NAME);
         channel.setMethodCallHandler(new FlutterXUpdatePlugin());
     }
+     // 新增的必需方法
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        mMethodChannel = new MethodChannel(binding.getBinaryMessenger(), PLUGIN_NAME);
+        mMethodChannel.setMethodCallHandler(this);
+        mApplication = (Application) binding.getApplicationContext();
+    }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
